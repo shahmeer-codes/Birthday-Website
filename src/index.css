@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #0b0712;
+    color: #f8fafc;
+  }
+
+  h1, h2, h3, .font-serif-display {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  .font-script {
+    font-family: 'Dancing Script', cursive;
+  }
+}
+
+/* Custom Glassmorphism Utility */
+.glass-panel {
+  background: rgba(255, 240, 245, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-panel-hover {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel-hover:hover {
+  background: rgba(255, 240, 245, 0.09);
+  border-color: rgba(255, 182, 193, 0.35);
+  box-shadow: 0 12px 40px 0 rgba(224, 58, 107, 0.25);
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+/* Soft Glow Text */
+.text-glow-rose {
+  text-shadow: 0 0 20px rgba(255, 92, 138, 0.6), 0 0 40px rgba(255, 182, 193, 0.3);
+}
+
+.text-glow-gold {
+  text-shadow: 0 0 20px rgba(224, 169, 109, 0.6), 0 0 35px rgba(255, 223, 186, 0.4);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #09060e;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(225, 120, 160, 0.25);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(225, 120, 160, 0.5);
+}
+
+/* Prevent layout jump */
+html {
+  scrollbar-gutter: stable;
+}
