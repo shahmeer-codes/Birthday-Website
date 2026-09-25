@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Volume2, VolumeX, Music } from 'lucide-react';
 
 interface AudioPlayerProps {
@@ -9,22 +9,85 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    const toggleAudio = () => {
+    const getAudio = () => {
         if (!audioRef.current && audioUrl) {
-            audioRef.current = new Audio(audioUrl);
-            audioRef.current.loop = true;
-            audioRef.current.volume = 0.4;
+            const audio = new Audio(audioUrl);
+            audio.loop = true;
+            audio.volume = 0.4;
+            audioRef.current = audio;
         }
+        return audioRef.current;
+    };
 
-        if (audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.pause();
-                setIsPlaying(false);
-            } else {
+    useEffect(() => {
+        if (!audioUrl) return;
+
+        const audio = getAudio();
+        if (!audio) return;
+
+        let cleanupListeners: (() => void) | null = null;
+
+        const handleFirstInteraction = () => {
+            if (audioRef.current && audioRef.current.paused) {
                 audioRef.current
                     .play()
+                    .then(() => {
+                        setIsPlaying(true);
+                        removeListeners();
+                    })
+                    .catch((err) => {
+                        console.log("Audio playback on user interaction failed:", err);
+                    });
+            } else {
+                removeListeners();
+            }
+        };
+
+        const removeListeners = () => {
+            window.removeEventListener('click', handleFirstInteraction);
+            window.removeEventListener('touchstart', handleFirstInteraction);
+            window.removeEventListener('keydown', handleFirstInteraction);
+            window.removeEventListener('pointerdown', handleFirstInteraction);
+        };
+
+        const setupInteractionListeners = () => {
+            window.addEventListener('click', handleFirstInteraction, { once: true });
+            window.addEventListener('touchstart', handleFirstInteraction, { once: true });
+            window.addEventListener('keydown', handleFirstInteraction, { once: true });
+            window.addEventListener('pointerdown', handleFirstInteraction, { once: true });
+            cleanupListeners = removeListeners;
+        };
+
+        if (audio.paused) {
+            audio
+                .play()
+                .then(() => {
+                    setIsPlaying(true);
+                })
+                .catch((err) => {
+                    console.log("Audio autoplay blocked by browser policy, waiting for first user interaction:", err);
+                    setupInteractionListeners();
+                });
+        }
+
+        return () => {
+            if (cleanupListeners) {
+                cleanupListeners();
+            }
+        };
+    }, [audioUrl]);
+
+    const toggleAudio = () => {
+        const audio = getAudio();
+        if (audio) {
+            if (isPlaying) {
+                audio.pause();
+                setIsPlaying(false);
+            } else {
+                audio
+                    .play()
                     .then(() => setIsPlaying(true))
-                    .catch((err) => console.log("Audio playback blocked by browser policy:", err));
+                    .catch((err) => console.log("Audio playback error:", err));
             }
         }
     };
